@@ -21,7 +21,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
   int currentIndex = 0;
   bool showQuestion = true;
   bool isRecording = false;
-  int questionTimer = 5;
+  int  questionTimer = 5;
   int answerTimer = 10;
 
   FlutterSoundRecorder _recorder = FlutterSoundRecorder();
@@ -46,16 +46,15 @@ class _SurveyScreenState extends State<SurveyScreen> {
   }
 
   // Function to play audio for "Repeat After Me"
- // Function to play audio for "Repeat After Me"
-Future<void> _playRepeatAfterMeAudio() async {
-  String audioPath = 'audio/Repeat_sentence.mp3'; // Path for the audio prompt
-  await _audioPlayer.play(AssetSource(audioPath)); // Use isLocal: true for local assets
-}
+  Future<void> _playRepeatAfterMeAudio() async {
+    String audioPath = 'audio/Repeat_sentence.mp3'; // Path for the audio prompt
+    await _audioPlayer.play(AssetSource(audioPath)); // Use isLocal: true for local assets
+  }
 
-Future<void> _playSequenceOfObjectAudio() async {
-  String audioPath = 'audio/Sequence_of_object.mp3'; // Path for the audio prompt
-  await _audioPlayer.play(AssetSource(audioPath)); // Use isLocal: true for local assets
-}
+  Future<void> _playSequenceOfObjectAudio() async {
+    String audioPath = 'audio/Sequence_of_object.mp3'; // Path for the audio prompt
+    await _audioPlayer.play(AssetSource(audioPath)); // Use isLocal: true for local assets
+  }
 
   // Show the question for a few seconds, then start recording
   void showNextQuestion() {
@@ -66,46 +65,93 @@ Future<void> _playSequenceOfObjectAudio() async {
       });
 
       // Check if it's the specific audio question
-      if (SQuestions[currentIndex].questionText == "Repeat After Me") {
+      if (SQuestions[currentIndex].questionText == "Listen to the commands") {
         _playRepeatAfterMeAudio().then((_) {
-          Timer(Duration(seconds: questionTimer), () {
+          Timer.periodic(Duration(seconds: 1), (Timer timer) {
+          if(questionTimer == 0){
+            timer.cancel();
             setState(() {
               showQuestion = false;
               startRecording();  // Start recording after the audio prompt
             });
+          }
+          setState(() {
+            if(questionTimer > 0){
+              questionTimer = questionTimer - 1;
+            }
           });
+          
+         });
+          // Timer(Duration(seconds: questionTimer + 2), () {
+          //   setState(() {
+          //     showQuestion = false;
+          //     startRecording();  // Start recording after the audio prompt
+          //   });
+          // });
         });
-      }
-      if (SQuestions[currentIndex].questionText == "Remember the sequence of objects.") {
-        _playSequenceOfObjectAudio().then((_) {
-          Timer(Duration(seconds: questionTimer), () {
+      } else if (SQuestions[currentIndex].questionText == "Redraw the figure shown below") {
+         Timer.periodic(Duration(seconds: 1), (Timer timer) {
+          if(questionTimer == 0){
+            timer.cancel();
             setState(() {
               showQuestion = false;
-              stopRecording();  // Start recording after the audio prompt
             });
-          });
-        });
-      }
-       else {
-        // For regular questions, display them normally
-        Timer(Duration(seconds: questionTimer), () {
+            // Navigate to the drawing board after 5 seconds
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DrawingBoard()),
+            );
+          }
           setState(() {
+            if(questionTimer > 0){
+              questionTimer = questionTimer - 1;
+            }
+          });
+          
+         });
+        // Timer(Duration(seconds: questionTimer), () {
+        //   setState(() {
+        //     showQuestion = false;
+        //     // Navigate to the drawing board after 5 seconds
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (context) => DrawingBoard()),
+        //     );
+        //   });
+        // });
+      } else {
+        // For regular questions, display them normally
+         Timer.periodic(Duration(seconds: 1), (Timer timer) {
+          if(questionTimer == 0){
+            timer.cancel();
+             setState(() {
             showQuestion = false;
             startRecording();
           });
-        });
+          }
+          setState(() {
+            if(questionTimer > 0){
+              questionTimer = questionTimer - 1;
+            }
+          });
+          
+         });
+        // Timer(Duration(seconds: questionTimer), () {
+        //   setState(() {
+        //     showQuestion = false;
+        //     startRecording();
+        //   });
+        // });
       }
     } else {
-      // Navigator.push(
-      //     context, MaterialPageRoute(builder: (ctx) => DrawingQues()));
       print("Survey Completed");
     }
   }
 
   // Start recording the user's answer
   void startRecording() async {
-    Directory appDir = await getApplicationDocumentsDirectory();
-    audioFilePath = '${appDir.path}/audio_${currentIndex}.aac';
+    String appDir = (await getExternalStorageDirectory())!.path;
+    audioFilePath = '$appDir/Question_${currentIndex}.aac';
 
     setState(() {
       isRecording = true;
@@ -139,6 +185,8 @@ Future<void> _playSequenceOfObjectAudio() async {
     showNextQuestion();
   }
 
+
+
   @override
   void dispose() {
     _recorder.closeRecorder();
@@ -147,20 +195,42 @@ Future<void> _playSequenceOfObjectAudio() async {
 
   Widget build(BuildContext context) {
     Widget content = Scaffold(
-        appBar: AppBar(
-          title: Text("Test Questions"),
-        ),
-        body: Column(
-          children: [
-            Center(
-              child: !isRecording
-                  ? Text(currentIndex < SQuestions.length
-                      ? "${SQuestions[currentIndex].questionText}     ${questionTimer.toString()}"
-                      : 'None')
-                  : Text("Recording....${answerTimer.toString()}"),
-            ),
-          ],
-        ));
+      appBar: AppBar(
+        title: Text("Test Questions"),
+      ),
+      body: Column(
+        children: [
+          Center(
+            child: !isRecording
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Builder(
+                        builder: (context) {
+                           
+                          return Text( 
+                            currentIndex < SQuestions.length
+                                ? "${SQuestions[currentIndex].questionText}     ${questionTimer.toString()}"
+                                : 'None',
+                          );
+                        }
+                      ),
+                      // Display the figure if the question is about redrawing
+                      if (SQuestions[currentIndex].questionText == "Redraw the figure shown below")
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Image.asset(
+                            'assets/figure.jpeg', // Update with your image path
+                            height: 200, // Set your desired height
+                          ),
+                        ),
+                    ],
+                  )
+                : Text("Recording....${answerTimer.toString()}"),
+          ),
+        ],
+      ),
+    );
     return content;
   }
 }

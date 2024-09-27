@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:survey_app/screens/survey_complete.dart'; // Make sure to import your SurveyCompletedScreen
 
 class DrawingBoard extends StatefulWidget {
   @override
@@ -15,6 +16,61 @@ class _DrawingBoardState extends State<DrawingBoard> {
   List<Offset?> points = [];
   GlobalKey _globalKey = GlobalKey();
 
+  // Clear the drawing points
+  void _clearDrawing() {
+    setState(() {
+      points.clear();
+    });
+  }
+
+  Future<void> _saveToImage(BuildContext context) async {
+    var status = await Permission.storage.status;
+
+    if (status.isDenied) {
+      // Request permission
+      await Permission.storage.request();
+    }
+
+    // Check if permission is granted
+    if (!await Permission.manageExternalStorage.isGranted) {
+      await Permission.manageExternalStorage.request();
+    }
+      try {
+         // Create a white background canvas
+      RenderRepaintBoundary boundary = _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage();
+      
+      // Create a new image with a white background
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder);
+      final paint = Paint()..color = Colors.white;
+
+      // Fill the background with white
+      canvas.drawRect(Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()), paint);
+
+      // Draw the original image on top of the white background
+      canvas.drawImage(image, Offset.zero, Paint());
+
+      // End recording and create the new image
+      ui.Image newImage = await recorder.endRecording().toImage(image.width, image.height);
+      ByteData? byteData = await newImage.toByteData(format: ui.ImageByteFormat.png);
+      Uint8List pngBytes = byteData!.buffer.asUint8List();
+
+      // Get the directory to save the image
+      final directory = (await getExternalStorageDirectory())!.path;
+      print(directory);
+      File imgFile = File('$directory/drawing.png');
+      await imgFile.writeAsBytes(pngBytes);
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Drawing saved as image!')));
+      } catch (e) {
+        print(e);
+      }
+    // } else {
+    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Storage permission not granted')));
+    // }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,8 +78,8 @@ class _DrawingBoardState extends State<DrawingBoard> {
         title: Text('Flutter Drawing Board'),
         actions: [
           IconButton(
-            icon: Icon(Icons.save),
-            onPressed: _saveToImage,
+            icon: Icon(Icons.clear), // Eraser icon
+            onPressed: _clearDrawing,
           ),
         ],
       ),
@@ -46,34 +102,23 @@ class _DrawingBoardState extends State<DrawingBoard> {
           ),
         ),
       ),
+      bottomNavigationBar: points.isNotEmpty
+          ? BottomAppBar(
+              child: TextButton(
+                onPressed: () {
+                  _saveToImage(context); // Save drawing before navigating
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) {
+                      return SurveyCompletedScreen(); // Navigate to the completion screen
+                    }),
+                  );
+                },
+                child: Text("Next"),
+              ),
+            )
+          : null, // Hide bottom bar if no points drawn
     );
-  }
-
-  Future<void> _saveToImage() async {
-    var status = await Permission.storage.request();
-    if (await Permission.storage.request().isGranted) {
-      try {
-        RenderRepaintBoundary boundary = _globalKey.currentContext!
-            .findRenderObject() as RenderRepaintBoundary;
-        ui.Image image = await boundary.toImage();
-        ByteData? byteData =
-            await image.toByteData(format: ui.ImageByteFormat.png);
-        Uint8List pngBytes = byteData!.buffer.asUint8List();
-
-        // Get the directory to save the image
-        final directory = (await getExternalStorageDirectory())!.path;
-        File imgFile = File('$directory/drawing.png');
-        await imgFile.writeAsBytes(pngBytes);
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Drawing saved as image!')));
-      } catch (e) {
-        print(e);
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Storage permission not granted')));
-    }
   }
 }
 
