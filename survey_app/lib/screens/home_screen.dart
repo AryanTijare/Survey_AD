@@ -15,19 +15,29 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Survey'),
+        title: const Text('Alzheimer\'s Disease Survey'),
       ),
       body: Center(
-        child: TextButton(
+        child: ElevatedButton(
           onPressed: () {
             Navigator.of(context)
                 .pushReplacement(MaterialPageRoute(builder: (ctx) {
-              return SurveyScreen();
+              return const SurveyScreen();
             }));
             // _speak('Hello');
           },
-          child: Text('Start Survey'),
+          child: const Text('New Survey'),
         ),
+        /*child: ElevatedButton(
+          onPressed: () {
+            Navigator.of(context)
+                .pushReplacement(MaterialPageRoute(builder: (ctx) {
+              return const SurveyScreen();
+            }));
+            // _speak('Hello');
+          },
+          child: const Text('Check Previous Surveys'),
+        ),*/
       ),
     );
   }
