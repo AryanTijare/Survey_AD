@@ -1,20 +1,13 @@
-import 'dart:io';
-
-//import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
-
 class Questions {
-  Questions({required this.id, required this.questionText});
-  final String id;
-  //final ansMode answerMode;
   final String questionText;
+  final String correctAnswer;
+
+  Questions(this.questionText, this.correctAnswer);
 }
 
-class AnswerModel {
-  final String uid;
-  final File ansFile;
-
-  AnswerModel({required this.ansFile, required this.uid});
-}
-
-enum ansMode { audio, drawing }
+List<Questions> surveyQuestions = [
+  Questions('What year is it?', '2024'),
+  Questions('What month is it?', 'October'),
+  Questions('What day is it?', 'Wednesday'),
+  Questions('What date is it?', '2'),
+];

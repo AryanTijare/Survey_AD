@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:survey_app/screens/new_survey.dart';
 import 'package:survey_app/screens/survey_screen.dart';
-//import 'package:pbl_project/screens.dart/survey_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,10 +18,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            Navigator.of(context)
-                .pushReplacement(MaterialPageRoute(builder: (ctx) {
-              return const SurveyScreen();
-            }));
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (ctx) => const SurveyScreen()),
+            );
             // _speak('Hello');
           },
           child: const Text('New Survey'),
