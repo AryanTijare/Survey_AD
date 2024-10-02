@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import '../model/ques_model.dart';
 import 'home_screen.dart';
+import 'survey_end_screen.dart';
 import '../widgets/tts_widget.dart';
 import '../widgets/stt_widget.dart';
 
@@ -14,9 +15,10 @@ class SurveyScreen extends StatefulWidget {
 
 class _SurveyScreenState extends State<SurveyScreen> {
   int _currentQuestionIndex = 0;
+  List<Questions> _surveyQuestions = GenerateSurveyQuestions();
   bool _isTtsActive = true;
   String _currentAnswer = '';
-  Map<int, String> _answers = {};    
+  Map<int, String> _answers = {};
 
   @override
   void initState() {
@@ -25,14 +27,19 @@ class _SurveyScreenState extends State<SurveyScreen> {
   }
 
   void _moveToNextQuestion() {
-    if (_currentQuestionIndex < surveyQuestions.length - 1) {
+    if (_currentQuestionIndex < _surveyQuestions.length - 1) {
       setState(() {
         _currentQuestionIndex++;
         _isTtsActive = true;
       });
     } else {
-      Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (ctx) => const HomeScreen()));
+      Map<int, bool> comparisonResults =
+          compareAnswers(_answers, _surveyQuestions);
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (ctx) => SurveyEndScreen(
+              questions: _surveyQuestions,
+              result: comparisonResults,
+              userAnswers: _answers)));
     }
   }
 
@@ -73,21 +80,22 @@ class _SurveyScreenState extends State<SurveyScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               _isTtsActive
-                ? TTSWidget(
-                    text: surveyQuestions[_currentQuestionIndex].questionText,
-                    onTtsComplete: _onTtsComplete,  
-                  )
-                : STTWidget(
-                    onSttComplete: () => _onSttComplete(_currentAnswer),
-                    onResult: (text) {
-                      setState(() {
-                        _currentAnswer = text;
-                      });
-                    },
-                  ),
+                  ? TTSWidget(
+                      text:
+                          _surveyQuestions[_currentQuestionIndex].questionText,
+                      onTtsComplete: _onTtsComplete,
+                    )
+                  : STTWidget(
+                      onSttComplete: () => _onSttComplete(_currentAnswer),
+                      onResult: (text) {
+                        setState(() {
+                          _currentAnswer = text;
+                        });
+                      },
+                    ),
               const SizedBox(height: 40),
               Text(
-                'Question ${_currentQuestionIndex + 1} of ${surveyQuestions.length}',
+                'Question ${_currentQuestionIndex + 1} of ${_surveyQuestions.length}',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
