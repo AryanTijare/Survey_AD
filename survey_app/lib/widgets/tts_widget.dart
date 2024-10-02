@@ -63,11 +63,16 @@ class _TTSWidgetState extends State<TTSWidget> {
           ),
           const SizedBox(height: 10),
           _isSpeaking
-              ? const CircularProgressIndicator()  
-              : IconButton(
+            ? const CircularProgressIndicator()  
+            : Icon(
+                Icons.mic_rounded,
+                size: 50,
+                color: Colors.blue,
+            ),
+                /*IconButton(
                   icon: const Icon(Icons.play_circle_filled, size: 50, color: Colors.blue),
                   onPressed: _speak,
-                ),
+                ),*/
         ],
       ),
     );
