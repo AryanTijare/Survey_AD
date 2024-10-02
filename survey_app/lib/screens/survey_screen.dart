@@ -5,9 +5,10 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:audioplayers/audioplayers.dart';  // Import audioplayers package
+import 'package:audioplayers/audioplayers.dart'; // Import audioplayers package
 import 'package:survey_app/data/ques_data.dart';
 import 'package:survey_app/model/ques_model.dart';
+import 'package:survey_app/screens/home_screen.dart';
 import 'package:survey_app/widgets/drawing_board.dart';
 
 class SurveyScreen extends StatefulWidget {
@@ -21,12 +22,13 @@ class _SurveyScreenState extends State<SurveyScreen> {
   int currentIndex = 0;
   bool showQuestion = true;
   bool isRecording = false;
-  int  questionTimer = 5;
+  int questionTimer = 5;
   int answerTimer = 10;
 
   FlutterSoundRecorder _recorder = FlutterSoundRecorder();
   String audioFilePath = "";
-  final AudioPlayer _audioPlayer = AudioPlayer();  // Create an AudioPlayer instance
+  final AudioPlayer _audioPlayer =
+      AudioPlayer(); // Create an AudioPlayer instance
 
   @override
   void initState() {
@@ -48,12 +50,15 @@ class _SurveyScreenState extends State<SurveyScreen> {
   // Function to play audio for "Repeat After Me"
   Future<void> _playRepeatAfterMeAudio() async {
     String audioPath = 'audio/Repeat_sentence.mp3'; // Path for the audio prompt
-    await _audioPlayer.play(AssetSource(audioPath)); // Use isLocal: true for local assets
+    await _audioPlayer
+        .play(AssetSource(audioPath)); // Use isLocal: true for local assets
   }
 
   Future<void> _playSequenceOfObjectAudio() async {
-    String audioPath = 'audio/Sequence_of_object.mp3'; // Path for the audio prompt
-    await _audioPlayer.play(AssetSource(audioPath)); // Use isLocal: true for local assets
+    String audioPath =
+        'audio/Sequence_of_object.mp3'; // Path for the audio prompt
+    await _audioPlayer
+        .play(AssetSource(audioPath)); // Use isLocal: true for local assets
   }
 
   // Show the question for a few seconds, then start recording
@@ -68,20 +73,19 @@ class _SurveyScreenState extends State<SurveyScreen> {
       if (SQuestions[currentIndex].questionText == "Listen to the commands") {
         _playRepeatAfterMeAudio().then((_) {
           Timer.periodic(Duration(seconds: 1), (Timer timer) {
-          if(questionTimer == 0){
-            timer.cancel();
-            setState(() {
-              showQuestion = false;
-              startRecording();  // Start recording after the audio prompt
-            });
-          }
-          setState(() {
-            if(questionTimer > 0){
-              questionTimer = questionTimer - 1;
+            if (questionTimer == 0) {
+              timer.cancel();
+              setState(() {
+                showQuestion = false;
+                startRecording(); // Start recording after the audio prompt
+              });
             }
+            setState(() {
+              if (questionTimer > 0) {
+                questionTimer = questionTimer - 1;
+              }
+            });
           });
-          
-         });
           // Timer(Duration(seconds: questionTimer + 2), () {
           //   setState(() {
           //     showQuestion = false;
@@ -89,9 +93,10 @@ class _SurveyScreenState extends State<SurveyScreen> {
           //   });
           // });
         });
-      } else if (SQuestions[currentIndex].questionText == "Redraw the figure shown below") {
-         Timer.periodic(Duration(seconds: 1), (Timer timer) {
-          if(questionTimer == 0){
+      } else if (SQuestions[currentIndex].questionText ==
+          "Redraw the figure shown below") {
+        Timer.periodic(Duration(seconds: 1), (Timer timer) {
+          if (questionTimer == 0) {
             timer.cancel();
             setState(() {
               showQuestion = false;
@@ -103,12 +108,11 @@ class _SurveyScreenState extends State<SurveyScreen> {
             );
           }
           setState(() {
-            if(questionTimer > 0){
+            if (questionTimer > 0) {
               questionTimer = questionTimer - 1;
             }
           });
-          
-         });
+        });
         // Timer(Duration(seconds: questionTimer), () {
         //   setState(() {
         //     showQuestion = false;
@@ -121,21 +125,20 @@ class _SurveyScreenState extends State<SurveyScreen> {
         // });
       } else {
         // For regular questions, display them normally
-         Timer.periodic(Duration(seconds: 1), (Timer timer) {
-          if(questionTimer == 0){
+        Timer.periodic(Duration(seconds: 1), (Timer timer) {
+          if (questionTimer == 0) {
             timer.cancel();
-             setState(() {
-            showQuestion = false;
-            startRecording();
-          });
+            setState(() {
+              showQuestion = false;
+              startRecording();
+            });
           }
           setState(() {
-            if(questionTimer > 0){
+            if (questionTimer > 0) {
               questionTimer = questionTimer - 1;
             }
           });
-          
-         });
+        });
         // Timer(Duration(seconds: questionTimer), () {
         //   setState(() {
         //     showQuestion = false;
@@ -185,8 +188,6 @@ class _SurveyScreenState extends State<SurveyScreen> {
     showNextQuestion();
   }
 
-
-
   @override
   void dispose() {
     _recorder.closeRecorder();
@@ -205,18 +206,16 @@ class _SurveyScreenState extends State<SurveyScreen> {
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Builder(
-                        builder: (context) {
-                           
-                          return Text( 
-                            currentIndex < SQuestions.length
-                                ? "${SQuestions[currentIndex].questionText}     ${questionTimer.toString()}"
-                                : 'None',
-                          );
-                        }
-                      ),
+                      Builder(builder: (context) {
+                        return Text(
+                          currentIndex < SQuestions.length
+                              ? "${SQuestions[currentIndex].questionText}     ${questionTimer.toString()}"
+                              : 'None',
+                        );
+                      }),
                       // Display the figure if the question is about redrawing
-                      if (SQuestions[currentIndex].questionText == "Redraw the figure shown below")
+                      if (SQuestions[currentIndex].questionText ==
+                          "Redraw the figure shown below")
                         Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Image.asset(
@@ -228,6 +227,14 @@ class _SurveyScreenState extends State<SurveyScreen> {
                   )
                 : Text("Recording....${answerTimer.toString()}"),
           ),
+          ElevatedButton(
+            child: Text("Quit Survey"),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (ctx) {
+                return const HomeScreen();
+                }));
+            },
+          )
         ],
       ),
     );
