@@ -26,6 +26,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
 
+  // Move to the next question or compare answers and go to end screen
   void _moveToNextQuestion() {
     if (_currentQuestionIndex < _surveyQuestions.length - 1) {
       setState(() {
@@ -80,20 +81,26 @@ class _SurveyScreenState extends State<SurveyScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               _isTtsActive
+                  // Display the current question with TTS Widget
                   ? TTSWidget(
                       text:
                           _surveyQuestions[_currentQuestionIndex].questionText,
-                      onTtsComplete: _onTtsComplete,
+                      onTtsComplete:
+                          _onTtsComplete, // Move to STT after TSS is complete
                     )
+                  // Recognize speech and display it
                   : STTWidget(
-                      onSttComplete: () => _onSttComplete(_currentAnswer),
+                      onSttComplete: () => _onSttComplete(
+                          _currentAnswer), // Move to next question after STT
                       onResult: (text) {
                         setState(() {
-                          _currentAnswer = text;
+                          _currentAnswer =
+                              text; // Update state with recognized text
                         });
                       },
                     ),
               const SizedBox(height: 40),
+              // Display the current question number
               Text(
                 'Question ${_currentQuestionIndex + 1} of ${_surveyQuestions.length}',
                 style: const TextStyle(
@@ -106,6 +113,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
           ),
         ),
       ),
+      // Bottom button to quit the survey
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(

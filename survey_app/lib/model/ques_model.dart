@@ -7,6 +7,7 @@ class Questions {
   Questions(this.questionText, this.correctAnswer);
 }
 
+// Dynamically generate survey questions
 List<Questions> GenerateSurveyQuestions() {
   DateTime now = DateTime.now();
 
@@ -25,8 +26,7 @@ List<Questions> GenerateSurveyQuestions() {
   return surveyQuestions;
 }
 
-//final surveyQuestions = GenerateSurveyQuestions();
-
+// Compare user's input answers with expected answers
 Map<int, bool> compareAnswers(
     Map<int, String> userAnswers, List<Questions> surveyQuestions) {
   Map<int, bool> results = {};

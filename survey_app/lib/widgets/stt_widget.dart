@@ -56,12 +56,12 @@ class _STTWidgetState extends State<STTWidget> {
           widget.onResult(
               _recognizedText); // Send the result back to the parent widget
         },
-        listenFor: const Duration(seconds: 10), // Listen for 10 seconds
+        listenFor: const Duration(seconds: 10),
         /*onSoundLevelChange: (level) {
-          print('Sound level: $level');  // Print the sound level
+          print('Sound level: $level'); 
         },*/
         cancelOnError: true,
-        partialResults: true, // Show partial results as they are recognized
+        partialResults: true,
         localeId: "en_US",
       );
 

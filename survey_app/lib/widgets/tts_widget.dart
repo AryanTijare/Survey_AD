@@ -5,7 +5,8 @@ class TTSWidget extends StatefulWidget {
   final String text;
   final VoidCallback? onTtsComplete;
 
-  const TTSWidget({Key? key, required this.text, this.onTtsComplete}) : super(key: key);
+  const TTSWidget({Key? key, required this.text, this.onTtsComplete})
+      : super(key: key);
 
   @override
   _TTSWidgetState createState() => _TTSWidgetState();
@@ -18,9 +19,10 @@ class _TTSWidgetState extends State<TTSWidget> {
   @override
   void initState() {
     super.initState();
-    _speak(); 
+    _speak();
   }
 
+  // Start speaking
   Future<void> _speak() async {
     setState(() {
       _isSpeaking = true;
@@ -33,21 +35,22 @@ class _TTSWidgetState extends State<TTSWidget> {
 
     _flutterTts.setCompletionHandler(() {
       setState(() {
-        _isSpeaking = false;  
+        _isSpeaking = false; // set state to false when speaking is done
       });
       if (widget.onTtsComplete != null) {
-        widget.onTtsComplete!();  
+        widget
+            .onTtsComplete!(); // call the onTtsComplete callback when TTS is finished
       }
     });
   }
 
   @override
   void dispose() {
-    _flutterTts.stop();  
+    _flutterTts.stop(); // Stop TTS when widget is disposed
     super.dispose();
   }
 
-  @override 
+  @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
@@ -63,16 +66,12 @@ class _TTSWidgetState extends State<TTSWidget> {
           ),
           const SizedBox(height: 10),
           _isSpeaking
-            ? const CircularProgressIndicator()  
-            : Icon(
-                Icons.mic_rounded,
-                size: 50,
-                color: Colors.blue,
-            ),
-                /*IconButton(
-                  icon: const Icon(Icons.play_circle_filled, size: 50, color: Colors.blue),
-                  onPressed: _speak,
-                ),*/
+              ? const CircularProgressIndicator() // show progress while speaking
+              : Icon(
+                  Icons.mic_rounded,
+                  size: 50,
+                  color: Colors.blue,
+                ),
         ],
       ),
     );
