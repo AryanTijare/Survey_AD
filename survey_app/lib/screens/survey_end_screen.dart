@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
-import '../model/ques_model.dart';
+import '../questions/questions.dart';
 
 class SurveyEndScreen extends StatelessWidget {
-  final List<Questions> questions;
+  final List<Question> questions;
   final Map<int, bool>
       result; // Holds whether each question was answered correctly
   final Map<int, String> userAnswers;
 
-  const SurveyEndScreen(
-      {Key? key,
-      required this.questions,
-      required this.result,
-      required this.userAnswers})
-      : super(key: key);
+  const SurveyEndScreen({
+    Key? key,
+    required this.questions,
+    required this.result,
+    required this.userAnswers,
+  }) : super(key: key);
 
   // Calculate the score
   int calculateScore() {
@@ -69,24 +69,27 @@ class SurveyEndScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ElevatedButton(
-          onPressed: () {
-            // Navigate back to home screen
-            Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (ctx) => const HomeScreen()));
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.redAccent,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.0),
+      bottomNavigationBar: SafeArea(
+        // Wrap the bottom button in SafeArea
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ElevatedButton(
+            onPressed: () {
+              // Navigate back to home screen
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (ctx) => const HomeScreen()));
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30.0),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-          ),
-          child: const Text(
-            'Quit Survey',
-            style: TextStyle(fontSize: 18),
+            child: const Text(
+              'Quit Survey',
+              style: TextStyle(fontSize: 18),
+            ),
           ),
         ),
       ),

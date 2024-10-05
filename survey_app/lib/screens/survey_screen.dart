@@ -1,7 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import '../model/ques_model.dart';
 import 'home_screen.dart';
+import '../questions/questions.dart';
+import '../questions/date_questions.dart';
+import '../questions/location_questions.dart';
 import 'survey_end_screen.dart';
 import '../widgets/tts_widget.dart';
 import '../widgets/stt_widget.dart';
@@ -15,15 +17,32 @@ class SurveyScreen extends StatefulWidget {
 
 class _SurveyScreenState extends State<SurveyScreen> {
   int _currentQuestionIndex = 0;
-  List<Questions> _surveyQuestions = GenerateSurveyQuestions();
+  List<Question> _surveyQuestions = [];
+  //List<Question> _dateQuestions = [];
+  //List<Question> _locationQuestions = [];
   bool _isTtsActive = true;
+  bool _isLoading = true;
   String _currentAnswer = '';
   Map<int, String> _answers = {};
+
+  // Fetch all survey questions
+  Future<void> _fetchQuestions() async {
+    print('fetching questions');
+    List<Question> locationQuestions = await generateLocationQuestions();
+    List<Question> dateQuestions = generateDateQuestions();
+    setState(() {
+      _surveyQuestions = dateQuestions + locationQuestions;
+      //_dateQuestions = dateQuestions;
+      //_locationQuestions = locationQuestions;
+      _isLoading = false;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    _fetchQuestions();
   }
 
   // Move to the next question or compare answers and go to end screen
@@ -34,8 +53,8 @@ class _SurveyScreenState extends State<SurveyScreen> {
         _isTtsActive = true;
       });
     } else {
-      Map<int, bool> comparisonResults =
-          compareAnswers(_answers, _surveyQuestions);
+      Map<int, bool> comparisonResults = getResults(_answers, _surveyQuestions);
+      //compareAnswers(_answers, _surveyQuestions);
       Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (ctx) => SurveyEndScreen(
               questions: _surveyQuestions,
@@ -68,6 +87,15 @@ class _SurveyScreenState extends State<SurveyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Show loading screen until questions are fetched
+
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(
+            child: CircularProgressIndicator()), // Show loading indicator
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Survey'),

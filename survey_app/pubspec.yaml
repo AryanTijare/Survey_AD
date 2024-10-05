@@ -16,6 +16,9 @@ dependencies:
   permission_handler: ^11.3.1
   flutter_tts: ^4.0.2
   intl: ^0.19.0
+  geolocator: ^13.0.1
+  geocoding: ^3.0.0
+  fuzzywuzzy: ^1.2.0
   speech_to_text: ^7.0.0
   flutter_sound: ^9.12.44
   flutter_riverpod: ^2.5.1
