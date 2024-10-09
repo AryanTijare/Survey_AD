@@ -23,6 +23,7 @@ dependencies:
   flutter_sound: ^9.12.44
   flutter_riverpod: ^2.5.1
   audioplayers: ^6.1.0  # Keep this version, ensure it matches your usage
+  shared_preferences: ^2.3.2
 
 
 dev_dependencies:
