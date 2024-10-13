@@ -1,14 +1,14 @@
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 
-enum QuestionType { date, location }
+enum QuestionType { date, location, text }
 
 class Question {
   final String questionText;
   final String correctAnswer;
   final QuestionType type;
-  int index;
+  final int index;
 
-  Question(this.questionText, this.correctAnswer, this.type, this.index);
+  Question( this.questionText,  this.correctAnswer , this.type,  this.index);
 }
 
 // Compare user's input answers with expected answers
@@ -80,6 +80,8 @@ Map<int, bool> getResults(
       results[index] = userAnswer == correctAnswer;
     } else if (surveyQuestions[index].type == QuestionType.location) {
       results[index] = fuzzySubstringMatch(userAnswer, correctAnswer);
+    } else if (surveyQuestions[index].type == QuestionType.text){
+      results[index] = userAnswer == correctAnswer;
     }
   }
   return results;

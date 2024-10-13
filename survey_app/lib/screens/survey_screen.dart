@@ -4,6 +4,7 @@ import 'home_screen.dart';
 import '../questions/questions.dart';
 import '../questions/date_questions.dart';
 import '../questions/location_questions.dart';
+import '../questions/easy_questions.dart'; // Import for easy questions
 import 'survey_end_screen.dart';
 import '../widgets/tts_widget.dart';
 import '../widgets/stt_widget.dart';
@@ -18,8 +19,6 @@ class SurveyScreen extends StatefulWidget {
 class _SurveyScreenState extends State<SurveyScreen> {
   int _currentQuestionIndex = 0;
   List<Question> _surveyQuestions = [];
-  //List<Question> _dateQuestions = [];
-  //List<Question> _locationQuestions = [];
   bool _isTtsActive = true;
   bool _isLoading = true;
   String _currentAnswer = '';
@@ -28,12 +27,14 @@ class _SurveyScreenState extends State<SurveyScreen> {
   // Fetch all survey questions
   Future<void> _fetchQuestions() async {
     print('fetching questions');
-    List<Question> locationQuestions = await generateLocationQuestions();
+
+    // Fetch date, location, and easy questions
     List<Question> dateQuestions = generateDateQuestions();
+    List<Question> locationQuestions = await generateLocationQuestions();
+    List<Question> easyQuestions = EasyQuestions().questions; // Fetch easy questions
+
     setState(() {
-      _surveyQuestions = dateQuestions + locationQuestions;
-      //_dateQuestions = dateQuestions;
-      //_locationQuestions = locationQuestions;
+      _surveyQuestions = dateQuestions + locationQuestions + easyQuestions; // Combine all questions
       _isLoading = false;
     });
   }
@@ -54,7 +55,6 @@ class _SurveyScreenState extends State<SurveyScreen> {
       });
     } else {
       Map<int, bool> comparisonResults = getResults(_answers, _surveyQuestions);
-      //compareAnswers(_answers, _surveyQuestions);
       Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (ctx) => SurveyEndScreen(
               questions: _surveyQuestions,
@@ -88,11 +88,9 @@ class _SurveyScreenState extends State<SurveyScreen> {
   @override
   Widget build(BuildContext context) {
     // Show loading screen until questions are fetched
-
     if (_isLoading) {
       return const Scaffold(
-        body: Center(
-            child: CircularProgressIndicator()), // Show loading indicator
+        body: Center(child: CircularProgressIndicator()), // Show loading indicator
       );
     }
 
@@ -111,19 +109,15 @@ class _SurveyScreenState extends State<SurveyScreen> {
               _isTtsActive
                   // Display the current question with TTS Widget
                   ? TTSWidget(
-                      text:
-                          _surveyQuestions[_currentQuestionIndex].questionText,
-                      onTtsComplete:
-                          _onTtsComplete, // Move to STT after TSS is complete
+                      text: _surveyQuestions[_currentQuestionIndex].questionText,
+                      onTtsComplete: _onTtsComplete, // Move to STT after TTS is complete
                     )
                   // Recognize speech and display it
                   : STTWidget(
-                      onSttComplete: () => _onSttComplete(
-                          _currentAnswer), // Move to next question after STT
+                      onSttComplete: () => _onSttComplete(_currentAnswer), // Move to next question after STT
                       onResult: (text) {
                         setState(() {
-                          _currentAnswer =
-                              text; // Update state with recognized text
+                          _currentAnswer = text; // Update state with recognized text
                         });
                       },
                     ),

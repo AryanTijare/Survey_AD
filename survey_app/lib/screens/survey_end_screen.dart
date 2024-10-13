@@ -49,12 +49,12 @@ class SurveyEndScreen extends StatelessWidget {
               child: ListView.builder(
                 itemCount: result.length,
                 itemBuilder: (context, index) {
-                  bool isCorrect = result[index]!;
+                  bool isCorrect = result[index] ?? false;
                   return ListTile(
                     title:
                         Text('Q${index + 1}: ${questions[index].questionText}'),
                     subtitle: Text(
-                      'Your answer: ${userAnswers[index]}',
+                      'Your answer: ${userAnswers[index] ?? ""}',
                       style: TextStyle(
                           color: isCorrect ? Colors.green : Colors.red),
                     ),

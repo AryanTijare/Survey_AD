@@ -127,20 +127,24 @@ Future<List<Question>> generateLocationQuestions() async {
 
   if (userLocation.containsKey('error')) {
     // Handle the error
-    return [];
+   userLocation['country'] = "Russia";
+   userLocation['state'] = "Maharashtra";
+   userLocation['city'] = "Pune";
+   userLocation['district'] = "Pune";
+   userLocation['locality'] = "Pimpri Colony";
   }
 
   List<Question> locationQuestions = [
     Question('What country are you in?', userLocation['country']!,
-        QuestionType.location, 4),
-    Question('What state are you in?', userLocation['state']!,
         QuestionType.location, 5),
-    Question('What city are you in?', userLocation['city']!,
+    Question('What state are you in?', userLocation['state']!,
         QuestionType.location, 6),
-    Question('What district are you in?', userLocation['district']!,
+    Question('What city are you in?', userLocation['city']!,
         QuestionType.location, 7),
-    Question('What locality are you in?', userLocation['locality']!,
+    Question('What district are you in?', userLocation['district']!,
         QuestionType.location, 8),
+    Question('What locality are you in?', userLocation['locality']!,
+        QuestionType.location, 9),
   ];
 
   return locationQuestions;
